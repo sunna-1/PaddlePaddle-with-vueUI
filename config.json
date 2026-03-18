@@ -1,0 +1,20 @@
+{
+  "detection": {
+    "min_area_ratio": 0.001,
+    "confidence_threshold": 0.5,
+    "color_range": {
+      "lower": [10, 100, 100],
+      "upper": [25, 255, 255]
+    }
+  },
+  "traffic_status": {
+    "smooth_threshold": 3,
+    "slow_threshold": 8,
+    "congested_max": 15
+  },
+  "analysis": {
+    "sample_interval": 1,
+    "trend_sample_rate": 30,
+    "max_trend_points": 50
+  }
+}
