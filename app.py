@@ -262,7 +262,8 @@ def process_video():
             '--output_dir', str(OUTPUT_DIR)
         ]
         
-        log_message(f"执行命令：{' '.join(cmd)}")
+        # 日志中显示相对路径，避免用户误解
+        log_message(f"执行命令：python PaddleDetection/deploy/pipeline/pipeline.py --config PaddleDetection/deploy/pipeline/config/infer_cfg_ppvehicle.yml --video_file {filename} --device GPU --output_dir PaddleDetection/output")
         
         # 执行命令
         try:

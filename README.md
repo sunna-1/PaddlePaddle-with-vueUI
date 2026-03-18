@@ -279,9 +279,24 @@ PaddleDetection/deploy/pipeline/config/infer_cfg_ppvehicle.yml
 
 ### 5. 文件路径问题
 
-- Windows路径使用反斜杠 `\` 或双反斜杠 `\\`
-- Linux/macOS路径使用正斜杠 `/`
-- 确保所有路径使用绝对路径或正确的相对路径
+本项目采用动态路径处理，自动适配不同的部署环境，**无需手动修改路径**：
+
+**路径处理机制**：
+- 项目根目录：自动通过`Path(__file__).parent.absolute()`获取
+- PaddleDetection目录：`项目根目录/PaddleDetection`
+- 输出目录：`项目根目录/PaddleDetection/output`
+- 上传目录：`项目根目录/PaddleDetection`
+
+**路径兼容性**：
+- ✅ **Windows**：自动处理路径分隔符（`\`或`/`）
+- ✅ **Linux/macOS**：自动处理路径分隔符（`/`）
+- ✅ **相对路径**：所有路径基于项目根目录，支持任意位置部署
+- ✅ **Python解释器**：自动使用当前激活环境的Python解释器
+
+**注意事项**：
+- 确保在项目根目录下运行`python app.py`
+- 不要修改`app.py`中的路径配置
+- 日志中显示的路径为相对路径，便于阅读和理解
 
 ### 6. 视频编码问题
 

@@ -79,8 +79,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
-*.cache
-.cache/
+*.cache/
 
 # PaddleDetection (keep only necessary files)
 PaddleDetection/dataset/
@@ -96,5 +95,5 @@ PaddleDetection/demo/*.mp4
 !PaddleDetection/demo/chepai.mp4
 !PaddleDetection/demo/chezai.mp4
 
-# PaddleDetection submodule
-PaddleDetection/
+# README pictures
+readme-pictures/
