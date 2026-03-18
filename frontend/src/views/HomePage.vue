@@ -80,7 +80,6 @@
         <div class="steps-container">
           <div class="step-card" v-for="(stage, i) in stages" :key="i">
             <div class="step-header">
-              <div class="step-number">{{ i + 1 }}</div>
               <div class="step-icon">
                 <component :is="stage.icon" theme="filled" size="28" :fill="stage.color" />
               </div>
@@ -231,6 +230,15 @@
           </a>
           <span>提供支持</span>
         </div>
+        <div class="footer-star">
+          <a href="https://github.com/sunna-1/PaddlePaddle-with-vueUI" target="_blank" class="star-link">
+            <Like theme="filled" size="16" fill="#e74c3c" />
+            <span>喜欢</span>
+            <span>的话请给本项目点个</span>
+            <Star theme="filled" size="16" fill="#f1c40f" />
+            <span>！</span>
+          </a>
+        </div>
       </div>
     </footer>
   </div>
@@ -258,7 +266,8 @@ import {
   ChartHistogram,
   CheckOne,
   Play,
-  Thunderbolt
+  Thunderbolt,
+  Like
 } from '@icon-park/vue-next'
 
 export default {
@@ -282,7 +291,8 @@ export default {
     ChartHistogram,
     CheckOne,
     Play,
-    Thunderbolt
+    Thunderbolt,
+    Like
   },
   setup() {
     const homeRef = ref(null)
@@ -346,7 +356,7 @@ export default {
         color: '#9b59b6'
       },
       {
-        title: '第三阶段（系统集成，最终版）',
+        title: '第三阶段（系统集成）',
         desc: '结合数据集训练权重微调与百度飞桨模型，搭建完整的网页端智能分析系统，解决精度太低、目标跟踪丢框等工程化问题，实现视频上传、智能识别、数据统计、可视化展示的全流程功能，达成项目落地应用',
         icon: 'Star',
         color: '#1abc9c'
@@ -357,8 +367,7 @@ export default {
       { module: '前端', tech: 'Vue 3 + Vite + ECharts', function: '页面交互、数据可视化展示' },
       { module: '后端', tech: 'Python 3.8 + Flask + OpenCV', function: '服务搭建、视频处理、流程调度' },
       { module: 'AI 算法', tech: 'PaddlePaddle 3.0.0/3.3.0 (GPU)、ResNet50、YOLOv8n、PPYOLOE-L + ByteTrack', function: '模型训练、目标检测/跟踪、路况识别' },
-      { module: '优化工具', tech: 'AdamW 优化器、Warmup+CosineAnnealing 学习率、混合精度训练', function: '提升模型训练效率与精度' },
-      { module: '部署环境', tech: 'Conda + venv', function: '环境隔离、一键部署' }
+      { module: '优化工具', tech: 'AdamW 优化器、Warmup+CosineAnnealing 学习率、混合精度训练', function: '提升模型训练效率与精度' }
     ]
 
     const datasets = [
@@ -391,9 +400,9 @@ export default {
 
     const highlights = [
       '前后端完整集成，实现从视频上传到结果展示的端到端流程',
-      '解决依赖缺失、环境冲突、视频编码等部署问题，系统可稳定正常运行',
       '轻量化模型设计，兼顾检测精度与处理速度，适配实际应用场景',
-      '配套自动化处理脚本与一键启动程序，提升系统易用性'
+      '现代化界面设计，采用简洁美观的UI风格，提供良好的用户体验',
+      '实时系统监控，提供CPU、内存、GPU使用情况等系统资源监控'
     ]
 
     const steps = [
@@ -1071,6 +1080,33 @@ export default {
 .iconpark-link:hover {
   color: #2563eb;
   text-decoration: underline;
+}
+
+.footer-star {
+  margin-top: 8px;
+}
+
+.star-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666666;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.star-link:hover {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.star-link .icon-park {
+  transition: transform 0.3s ease;
+}
+
+.star-link:hover .icon-park {
+  transform: scale(1.2);
 }
 
 @media (max-width: 1024px) {
