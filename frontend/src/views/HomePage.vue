@@ -204,7 +204,6 @@
         </div>
         <div class="usage-steps">
           <div class="usage-step" v-for="(step, i) in steps" :key="i">
-            <div class="step-badge">{{ i + 1 }}</div>
             <div class="step-content">
               <component :is="step.icon" theme="filled" size="24" :fill="step.color" />
               <p class="step-text">{{ step.text }}</p>

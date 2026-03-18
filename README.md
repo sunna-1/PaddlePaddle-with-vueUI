@@ -66,10 +66,11 @@ pythonProject/
 
 ### 环境要求
 
-- **Python**：3.8 或更高版本
+- **Python**：3.9-3.13（推荐Python 3.10）
+- **pip**：20.2.2 或更高版本
 - **Node.js**：16.x 或更高版本
 - **GPU**：NVIDIA GPU（推荐，CPU模式也可运行但速度较慢）
-- **CUDA**：11.2 或更高版本（GPU模式需要）
+- **CUDA**：11.8 或更高版本（GPU模式需要）
 - **操作系统**：Windows 10/11、Linux、macOS
 
 ### 安装步骤
@@ -83,35 +84,75 @@ cd PaddlePaddle-with-vueUI
 
 #### 2. 创建Python虚拟环境
 
+**Windows系统（推荐使用Conda）**：
+
 ```bash
-# 使用Conda创建环境（推荐）
-conda create -n traffic python=3.8
-conda activate traffic
+# 创建名为pp的虚拟环境
+conda create -n pp python=3.10 -y
+
+# 激活虚拟环境
+conda activate pp
+```
+
+**或使用venv**：
+
+```bash
+# 创建虚拟环境
+python -m venv pp
+
+# 激活虚拟环境
+pp\Scripts\activate
+```
+
+**Linux/macOS系统**：
+
+```bash
+# 使用Conda
+conda create -n pp python=3.10 -y
+conda activate pp
 
 # 或使用venv
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/macOS
-source venv/bin/activate
+python -m venv pp
+source pp/bin/activate
 ```
 
 #### 3. 安装Python依赖
 
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-**注意事项**：
-- 如果使用GPU，请安装GPU版本的PaddlePaddle：
+**安装PaddlePaddle**：
+
+根据您的CUDA版本选择合适的PaddlePaddle版本：
+
+- **CUDA 11.8**：
   ```bash
-  pip install paddlepaddle-gpu
+  pip install paddlepaddle-gpu==3.3.0
   ```
-- 如果使用CPU，请安装CPU版本：
+
+- **CUDA 12.0**：
   ```bash
-  pip install paddlepaddle
+  pip install paddlepaddle-gpu==3.3.0
   ```
-- 确保CUDA版本与PaddlePaddle版本兼容
+
+- **CUDA 12.6**：
+  ```bash
+  pip install paddlepaddle-gpu==3.3.0
+  ```
+
+- **CUDA 12.9**：
+  ```bash
+  pip install paddlepaddle-gpu==3.3.0
+  ```
+
+- **CPU版本**（无GPU）：
+  ```bash
+  pip install paddlepaddle==3.3.0
+  ```
+
+> 💡 **提示**：更多安装详情请参考 [PaddlePaddle官方安装文档](https://www.paddlepaddle.org.cn/documentation/docs/zh/install/index_cn.html)
 
 #### 4. 安装前端依赖
 
@@ -136,29 +177,30 @@ npm install
 
 #### 6. 启动项目
 
-**方式一：使用一键启动脚本（Windows）**
+**启动后端**：
 
 ```bash
-start.bat
-```
+# 确保在虚拟环境中
+conda activate pp
 
-**方式二：手动启动**
-
-启动后端：
-```bash
+# 启动后端服务
 python app.py
 ```
 
-启动前端（新终端）：
+后端将在 http://localhost:5000 启动
+
+**启动前端（新终端）**：
+
 ```bash
 cd frontend
 npm run dev
 ```
 
+前端将在 http://localhost:3000 启动（或Vite显示的端口）
+
 #### 7. 访问系统
 
-- 前端地址：http://localhost:3000（或Vite显示的端口）
-- 后端API：http://localhost:5000/api
+打开浏览器访问：http://localhost:3000
 
 ## 使用说明
 
@@ -194,16 +236,15 @@ npm run dev
 ### 1. 依赖版本兼容性
 
 - **PaddlePaddle版本**：确保CUDA版本与PaddlePaddle版本匹配
-  - PaddlePaddle 3.0.0：CUDA 11.2+
   - PaddlePaddle 3.3.0：CUDA 11.8+
-- **Python版本**：建议使用Python 3.8-3.10
+- **Python版本**：建议使用Python 3.9-3.13（推荐Python 3.10）
 - **Node.js版本**：建议使用16.x或18.x
 
 ### 2. GPU环境配置
 
 如果使用GPU，请确保：
 - 已安装NVIDIA驱动
-- 已安装CUDA Toolkit
+- 已安装CUDA Toolkit（11.8或更高版本）
 - 已安装cuDNN
 - 环境变量正确配置：
   ```bash
@@ -325,6 +366,8 @@ pip install -r requirements.txt
 ## 致谢
 
 - **PaddlePaddle飞桨**：百度开源的深度学习平台
+  - [GitHub仓库](https://github.com/PaddlePaddle/Paddle/releases?github.com)
+  - [官方网站](https://www.paddlepaddle.org.cn/documentation/docs/zh/install/index_cn.html)
 - **Ultralytics YOLOv8**：先进的目标检测算法
 - **PaddleDetection**：飞桨目标检测开发套件
 - **ByteTrack**：高性能多目标跟踪算法
