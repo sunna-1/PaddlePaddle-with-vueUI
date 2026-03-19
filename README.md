@@ -10,13 +10,10 @@
 
 - 🎬 **多格式视频上传**：支持MP4、AVI、MOV等常见视频格式
 - 🤖 **AI智能识别**：集成目标检测与跟踪算法，自动完成道路中车辆的识别与轨迹追踪
-- 🚗 **车牌识别**：自动识别车辆车牌号码（蓝牌/绿牌）
-- 🛣️ **车道线检测**：检测并绘制车道线，辅助交通分析
-- ⚠️ **压线检测**：检测车辆是否压线，需配置警戒线坐标
-- 🔙 **逆行检测**：检测车辆逆行行为
 - 📊 **多维度车流量统计**：支持车辆总数、唯一ID车辆数、道路平均车辆密度等指标统计
 - 🚦 **智能路况判断**：基于检测结果自动判定道路为畅通/缓行/拥堵三类状态
 - 📈 **可视化结果展示**：提供带检测标注的视频回放、车流量/路况统计图表展示
+- 🎯 **实时路况占比**：环形图展示畅通、缓行、拥堵的占比分布
 
 ## 技术栈
 
@@ -36,8 +33,10 @@
 - **PP-Vehicle**：PaddleDetection的实时车辆分析工具
 - **PPYOLOE-L**：高精度车辆检测模型
 - **ByteTrack**：高性能多目标跟踪算法
-- **PP-OCRv3**：车牌识别模型
-- **PP-Lite-STDC2**：车道线分割模型
+
+## 项目演示
+
+📺 **视频演示**：[基于vue3和百度飞桨3.3搭建的车辆识别系统-哔哩哔哩](https://b23.tv/eIxrcQG)
 
 ## 项目结构
 
@@ -45,14 +44,18 @@
 pythonProject/
 ├── frontend/              # 前端项目
 │   ├── public/           # 静态资源
-│   │   └── video-demo/ # 演示视频
 │   ├── src/             # 源代码
 │   │   ├── views/       # 页面组件
 │   │   ├── App.vue     # 根组件
 │   │   ├── main.js     # 入口文件
 │   │   └── router.js   # 路由配置
 │   └── package.json    # 前端依赖
-├── PaddleDetection/     # 飞桨检测框架（子模块）
+├── PaddleDetection/     # 飞桨检测框架
+│   ├── deploy/         # 部署脚本
+│   │   └── pipeline/   # PP-Vehicle工具
+│   │       └── config/ # 配置文件
+│   ├── configs/        # 模型配置
+│   └── output/        # 输出目录
 ├── video-demo/         # 测试视频
 ├── app.py             # 后端主程序
 ├── config.json        # 配置文件
@@ -258,18 +261,77 @@ npm run dev
 PaddleDetection/deploy/pipeline/config/infer_cfg_ppvehicle.yml
 ```
 
-**默认功能配置**：
-- ✅ **多目标跟踪 (MOT)**：实时检测并跟踪车辆，输出唯一ID
-- ✅ **车牌识别**：识别车牌号码（蓝牌/绿牌）
-- ✅ **车道线检测**：检测车道线，用于绘制和辅助违章判断
-- ✅ **压线检测**：检测车辆是否压线（需配置`fence_line`）
-- ✅ **逆行检测**：检测车辆逆行行为（需配合车道线或调整参数）
-- ❌ **车辆属性识别**：因模型文件不兼容而关闭
+**当前功能配置**：
+- ✅ **多目标跟踪 (MOT)**：实时检测并跟踪车辆，输出唯一ID（已开启）
+- ❌ **车牌识别**：识别车牌号码（蓝牌/绿牌）（已关闭）
+- ❌ **车道线检测**：检测车道线（已关闭）
+- ❌ **压线检测**：检测车辆是否压线（已关闭）
+- ❌ **逆行检测**：检测车辆逆行行为（已关闭）
+- ❌ **车辆属性识别**：识别车辆颜色和类型（已关闭）
 
 **配置说明**：
 - 开启/关闭功能：编辑配置文件，修改对应模块的`enable`字段
-- 压线检测：需设置`fence_line`坐标，格式为`[x1, y1, x2, y2]`
 - 模型路径：支持HTTP URL或本地路径，首次运行自动下载模型（约300MB）
+- 模型默认缓存到`C:\Users\<用户名>/.cache/paddle/infer_weights/`目录
+
+**PP-Vehicle详细部署教程**：
+
+#### 环境要求
+- **操作系统**：Windows / Linux（本教程基于 Windows 11 测试）
+- **Python**：3.9 - 3.12（推荐 3.9）
+- **CUDA**：11.8（GPU 版 PaddlePaddle 需要，CPU 版可跳过）
+- **GPU 显存**：建议 ≥ 6GB（同时开启多模块时需更多显存）
+- **Git**：用于克隆代码仓库
+
+#### 部署步骤
+
+**1. 创建 conda 环境**
+```bash
+conda create -n pp python=3.9 -y
+conda activate pp
+pip install --upgrade pip
+```
+
+**2. 安装 PaddlePaddle**
+根据你的 CUDA 版本选择对应命令。本项目使用 CUDA 11.8，安装命令如下：
+```bash
+python -m pip install paddlepaddle-gpu==3.3.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+```
+如果使用 CPU 或无合适 CUDA 版本，请参考 [PaddlePaddle 官网](https://www.paddlepaddle.org.cn/install/quick) 选择安装命令。
+
+**3. 克隆 PaddleDetection 仓库**
+```bash
+git clone https://github.com/PaddlePaddle/PaddleDetection.git
+cd PaddleDetection
+```
+
+**4. 安装项目依赖**
+```bash
+pip install -r requirements.txt
+pip install scikit-learn          # MOT 依赖
+pip install numba==0.56.4         # 可选，提升跟踪速度
+```
+
+**5. 模型下载（自动方式）**
+PP-Vehicle 的模型通过配置文件中的 URL 自动下载。你无需手动下载，只需确保运行命令时网络畅通即可。
+
+**6. 运行分析**
+将你的车载视频（例如 `dashcam.mp4`）放入 `PaddleDetection` 目录下，执行：
+```bash
+python deploy/pipeline/pipeline.py \
+    --config deploy/pipeline/config/infer_cfg_ppvehicle.yml \
+    --video_file=dashcam.mp4 \
+    --device=gpu \
+    --output_dir=./output
+```
+- `--device`：可选 `gpu` 或 `cpu`
+- `--output_dir`：结果视频保存目录
+
+首次运行会自动下载模型（约 300MB），请耐心等待。
+
+**7. 查看结果**
+- 输出视频位于 `./output/dashcam.mp4`，包含检测框、跟踪 ID
+- 控制台会实时打印每帧的检测信息，可用于统计车辆数量
 
 ### 4. 端口占用
 
@@ -358,15 +420,7 @@ pip install numba==0.56.4         # 可选，提升跟踪速度
 - 使用跳帧处理：`--skip_frame_num=2`
 - 增加GPU显存
 
-### Q4: 检测精度不理想
-
-**A**:
-- 确保使用正确的模型权重
-- 调整检测阈值
-- 使用更高分辨率的视频
-- 训练模型适配特定场景
-
-### Q5: 内存溢出
+### Q4: 内存溢出
 
 **A**:
 - 减小视频分辨率
@@ -416,6 +470,66 @@ VEHICLE_PRESSING:
 - 调整配置文件中的参数：`deviation`、`move_scale`、`frame_len`
 - 参考PaddleDetection文档调整
 - 如果不需要，可直接关闭逆行检测（`enable: false`）
+
+### Q12: PP-Vehicle模型下载失败
+
+**A**: 
+- 检查网络连接，确保可以访问百度云
+- 使用代理或更换网络环境
+- 手动下载模型：从配置文件中的URL下载模型压缩包，解压到本地，然后修改配置文件中的`model_dir`为本地路径
+- Windows PowerShell正确下载命令：
+  ```powershell
+  Invoke-WebRequest -Uri <URL> -OutFile <filename.zip>
+  ```
+  或使用系统自带的`curl.exe`：
+  ```powershell
+  curl.exe -L -o <filename.zip> <URL>
+  ```
+
+### Q13: 运行时提示"Unable to use numba in PP-Tracking"
+
+**A**: 
+- 这是警告信息，不影响功能
+- 如需提升跟踪速度，安装numba：
+  ```bash
+  pip install numba==0.56.4
+  ```
+
+### Q14: 警告"No ccache found"
+
+**A**: 
+- 这是不影响运行的警告，可以忽略
+- 如需优化编译速度，安装ccache：
+  ```bash
+  # Linux/macOS
+  sudo apt-get install ccache
+  
+  # Windows (使用conda)
+  conda install -c conda-forge ccache
+  ```
+
+### Q15: 错误"ValueError: not find model file path .../inference.pdmodel"
+
+**A**: 
+- 模型文件未下载或路径错误
+- 检查配置文件中的`model_dir`是否正确指向包含`.pdmodel`文件的文件夹
+- 确认URL可访问或本地路径正确
+- 尝试删除缓存目录重新下载：
+  ```bash
+  # Windows
+  rm -rf C:\Users\<用户名>\.cache\paddle\infer_weights\
+  
+  # Linux/macOS
+  rm -rf ~/.cache/paddle/infer_weights/
+  ```
+
+### Q16: 车辆跟踪ID不稳定
+
+**A**: 
+- 调整跟踪器配置：编辑`deploy/pipeline/config/tracker_config.yml`
+- 调整参数如`track_buffer`、`match_thresh`等
+- 参考ByteTrack文档进行参数调优
+- 如果视频中有遮挡严重的情况，这是正常现象
 
 ## 项目特点
 

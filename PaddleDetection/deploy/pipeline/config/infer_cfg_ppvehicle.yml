@@ -21,7 +21,7 @@ VEHICLE_PLATE:
   rec_image_shape: [3, 48, 320]
   rec_batch_num: 6
   word_dict_path: deploy/pipeline/ppvehicle/rec_word_dict.txt
-  enable: True
+  enable: False
 
 VEHICLE_ATTR:
   model_dir: https://bj.bcebos.com/v1/paddledet/models/pipeline/vehicle_attribute_model.zip
@@ -35,7 +35,7 @@ LANE_SEG:
   model_dir: https://bj.bcebos.com/v1/paddledet/models/pipeline/pp_lite_stdc2_bdd100k.zip
 
 VEHICLE_PRESSING:
-  enable: True
+  enable: False
 
 VEHICLE_RETROGRADE:
   frame_len: 8

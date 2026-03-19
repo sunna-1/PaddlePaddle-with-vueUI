@@ -265,6 +265,12 @@
               <h2>车流密度趋势</h2>
               <div ref="trendChart" class="chart-container"></div>
             </div>
+
+            <!-- 路况占比 -->
+            <div class="card chart-card" v-if="analysisResult.traffic_status_distribution">
+              <h2>路况占比</h2>
+              <div ref="statusChart" class="chart-container"></div>
+            </div>
           </div>
 
           <div v-else class="empty-state">
@@ -282,7 +288,6 @@
 import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
 import axios from 'axios'
 import * as echarts from 'echarts'
-import gsap from 'gsap'
 import {
   Car,
   Home,
@@ -304,6 +309,7 @@ export default {
     const annotatedVideoPlayer = ref(null)
     const classChart = ref(null)
     const trendChart = ref(null)
+    const statusChart = ref(null)
 
     const uploadedFile = ref(null)
     const fileSize = ref(0)
@@ -327,6 +333,7 @@ export default {
 
     let classChartInstance = null
     let trendChartInstance = null
+    let statusChartInstance = null
 
     const hasResult = computed(() => analysisResult.value !== null)
 
@@ -580,6 +587,33 @@ export default {
             })
           }
         }
+
+        if (statusChart.value && analysisResult.value.traffic_status_distribution) {
+          const statusChartRect = statusChart.value.getBoundingClientRect()
+          if (statusChartRect.width > 0 && statusChartRect.height > 0) {
+            if (statusChartInstance) statusChartInstance.dispose()
+
+            statusChartInstance = echarts.init(statusChart.value)
+            const statusData = analysisResult.value.traffic_status_distribution
+
+            statusChartInstance.setOption({
+              backgroundColor: 'transparent',
+              tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
+              series: [{
+                name: '路况占比',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                itemStyle: { borderRadius: 10, borderColor: '#0a0a0f', borderWidth: 2 },
+                label: { show: true, formatter: '{b}: {c}%' },
+                data: [
+                  { value: statusData.smooth, name: '畅通', itemStyle: { color: '#00d4aa' } },
+                  { value: statusData.slow, name: '缓行', itemStyle: { color: '#f59e0b' } },
+                  { value: statusData.congested, name: '拥堵', itemStyle: { color: '#ff6b35' } }
+                ]
+              }]
+            })
+          }
+        }
       }, 100)
     }
 
@@ -652,21 +686,11 @@ export default {
       updateBackendStatus()
     })
 
-    watch(analysisResult, (val) => {
-      if (val) {
-        nextTick(() => {
-          const stats = document.querySelectorAll('.stat-card')
-          if (stats.length) {
-            gsap.from(stats, { opacity: 0, y: 30, stagger: 0.1, duration: 0.6, ease: 'power2.out' })
-          }
-        })
-      }
-    })
-
     onUnmounted(() => {
       clearInterval(statusInterval)
       if (classChartInstance) classChartInstance.dispose()
       if (trendChartInstance) trendChartInstance.dispose()
+      if (statusChartInstance) statusChartInstance.dispose()
     })
 
     return {
