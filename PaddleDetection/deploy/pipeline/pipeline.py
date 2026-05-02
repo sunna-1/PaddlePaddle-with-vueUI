@@ -688,6 +688,9 @@ class PipePredictor(object):
 
         frame_id = 0
 
+        # 用于导出检测数据的帧数据收集
+        frame_data_list = []
+
         entrance, records, center_traj = None, None, None
         if self.draw_center_traj:
             center_traj = [{}]
@@ -804,6 +807,12 @@ class PipePredictor(object):
 
                 # nothing detected
                 if len(mot_res['boxes']) == 0:
+                    # 收集空帧检测数据（精简格式）
+                    frame_data_list.append({
+                        'fid': frame_id,
+                        'n': 0,
+                        'v': []
+                    })
                     frame_id += 1
                     if frame_id > self.warmup_frame:
                         self.pipe_timer.img_num += 1
@@ -1070,6 +1079,31 @@ class PipePredictor(object):
 
                     retrograde_traj_len = 0
 
+            # 收集当前帧的检测数据用于后续分析（精简格式，减少开销）
+            current_mot_res = self.pipeline_res.get('mot')
+            if current_mot_res is not None and len(current_mot_res['boxes']) > 0:
+                frame_vehicles = []
+                for box in current_mot_res['boxes']:
+                    # 仅保留分析所需字段，减少内存和序列化开销
+                    frame_vehicles.append([
+                        int(box[0]),     # track_id
+                        float(box[3]),  # xmin
+                        float(box[4]),  # ymin
+                        float(box[5]),  # xmax
+                        float(box[6])   # ymax
+                    ])
+                frame_data_list.append({
+                    'fid': frame_id,
+                    'n': len(frame_vehicles),
+                    'v': frame_vehicles
+                })
+            else:
+                frame_data_list.append({
+                    'fid': frame_id,
+                    'n': 0,
+                    'v': []
+                })
+
             self.collector.append(frame_id, self.pipeline_res)
 
             if frame_id > self.warmup_frame:
@@ -1097,6 +1131,26 @@ class PipePredictor(object):
         if self.cfg['visual'] and len(self.pushurl) == 0:
             writer.release()
             print('save result to {}'.format(out_path))
+
+        # 导出检测数据为 JSON 文件（紧凑格式，减少IO开销）
+        if len(frame_data_list) > 0:
+            import json as json_mod
+            json_out_name = 'output' if (
+                self.file_name is None or
+                type(self.file_name) == int) else self.file_name
+            json_out_path = os.path.join(self.output_dir, json_out_name + "_detection.json")
+            detection_data = {
+                'video_info': {
+                    'width': width,
+                    'height': height,
+                    'fps': video_fps,
+                    'total_frames': frame_id
+                },
+                'frames': frame_data_list
+            }
+            with open(json_out_path, 'w', encoding='utf-8') as f:
+                json_mod.dump(detection_data, f, ensure_ascii=False, separators=(',', ':'))
+            print('save detection data to {}'.format(json_out_path))
 
     def visualize_video(self,
                         image_rgb,
